@@ -1,45 +1,32 @@
-def main():
-  book_path = "books/frankenstein.txt"
-  text = get_book_text(book_path)
-  word_count = get_word_count(text)
-  char_dict = count_letters(text)
-  chars_sorted_list = chars_dict_to_sorted_list(char_dict)
-
-  print(f"--- Begin report of {book_path} ---")
-  print(f"{word_count} found in the document")
-  print()
-
-  for item in chars_sorted_list:
-    if not item["char"].isalpha():
-      continue
-    print(f"The '{item['char']}' character was found {item['num']} times")
-  print("--- End report ---")
+import sys
+from stats import count_words, count_characters_dict, dict_to_sorted_list
 
 def get_book_text(path):
-  with open(path) as f:
-    return f.read()
+    with open(path) as f:
+        file_contents = f.read()
+        return file_contents
 
-def get_word_count(text):
-  return len(text.split())
+def print_report(dict_list, path, word_count):
+    print("============ BOOKBOT ============")
+    print(f"Analyzing book found at {path}...")
+    print("----------- Word Count ----------")
+    print(f"Found {word_count} total words")
+    print("--------- Character Count -------")
 
-def count_letters(text):
-  dict = {}
-  characters = text.lower()
-  for char in characters:
-    if char in dict:
-      dict[char] += 1
-    else:
-      dict[char] = 1
-  return dict
+    for char_dict in dict_list:
+        char = char_dict["char"]
+        num = char_dict["num"]
+        if char.isalpha():
+            print(f"{char}: {num}")
+    print("============= END ===============")
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python3 main.py <path_to_book>")
+        sys.exit(1)
 
-def sort_on(dict):
-  return dict["num"]
-
-def chars_dict_to_sorted_list(num_chars_dict):
-    sorted_list = []
-    for ch in num_chars_dict:
-        sorted_list.append({"char": ch, "num": num_chars_dict[ch]})
-    sorted_list.sort(reverse=True, key=sort_on)
-    return sorted_list
-
+    text = get_book_text(sys.argv[1])
+    word_count = count_words(text)
+    character_count = count_characters_dict(text)
+    sorted_list = dict_to_sorted_list(character_count)
+    print_report(sorted_list, sys.argv[1], word_count)
 main()
